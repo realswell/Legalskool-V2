@@ -16,29 +16,29 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      - name: Build index.html from payload parts
+      - name: Decode payload into index.html
         run: |
           set -euo pipefail
-          shopt -s nullglob
-          parts=(.payload/p??.txt)
-          if [ "${#parts[@]}" -ne 26 ]; then
-            echo "Expected 26 payload parts, found ${#parts[@]}"
-            ls -la .payload || true
-            exit 1
-          fi
-          cat .payload/p00.txt .payload/p01.txt .payload/p02.txt .payload/p03.txt \
-              .payload/p04.txt .payload/p05.txt .payload/p06.txt .payload/p07.txt \
-              .payload/p08.txt .payload/p09.txt .payload/p10.txt .payload/p11.txt \
-              .payload/p12.txt .payload/p13.txt .payload/p14.txt .payload/p15.txt \
-              .payload/p16.txt .payload/p17.txt .payload/p18.txt .payload/p19.txt \
-              .payload/p20.txt .payload/p21.txt .payload/p22.txt .payload/p23.txt \
-              .payload/p24.txt .payload/p25.txt > index.html
+          missing=0
+          for i in $(seq -w 0 30); do
+            f=".payload/b${i}.b64"
+            if [ ! -f "$f" ]; then
+              echo "missing $f"
+              missing=1
+            fi
+          done
+          test "$missing" -eq 0
+          : > /tmp/index.b64
+          for i in $(seq -w 0 30); do
+            tr -d '\n\r ' < ".payload/b${i}.b64" >> /tmp/index.b64
+          done
+          base64 -d /tmp/index.b64 > index.html
           bytes=$(wc -c < index.html)
           echo "index.html bytes: $bytes"
           test "$bytes" -eq 455844
-          grep -q "provider=google&apikey=" index.html
-          grep -q "encodeURIComponent(LEGALSKOOL_CONFIG.supabaseKey)" index.html
-          head -c 15 index.html | grep -q "<!DOCTYPE html>"
+          echo "bae9e4af43da4c266608769619d8e43d028be10be00f15e7ebf38e62b1ffca83  index.html" | sha256sum -c -
+          grep -q 'provider=google&apikey=' index.html
+          head -c 15 index.html | grep -q '<!DOCTYPE html>'
 
       - name: Commit assembled index.html
         run: |
@@ -47,9 +47,5 @@ jobs:
           git config user.email "322542834+realswell@users.noreply.github.com"
           git add index.html
           git rm -r --ignore-unmatch .payload
-          if git diff --cached --quiet; then
-            echo "Nothing to commit"
-            exit 0
-          fi
           git commit -m "Add production index.html (Google authorize URL includes apikey)"
           git push origin HEAD:main
