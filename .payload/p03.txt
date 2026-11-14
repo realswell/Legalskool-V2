@@ -3,7 +3,7 @@ d8VKMKdwPVFgR8wtn6fo9mlHC88rIt10T1hW04Za01krRQT/WIWkYPl0QC9su8fGFgG16qopZgcxZ/rP
             <div class="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <div class="font-mono text-[10px] uppercase tracking-widest text-gold-400">CHAMBER-READY STANDARD</div>
-                <div class="text-sm sm:text-base font-medium text-white">Verified citations · BNS, BNSS & BSA mapped</div>
+                <div class="text-sm sm:text-base font-medium text-white">Verified citations · BNS, BNSS &amp; BSA mapped</div>
               </div>
               <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-mono text-[11px]">
                 7-Day Full Refund
