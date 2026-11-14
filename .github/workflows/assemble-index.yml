@@ -1,0 +1,55 @@
+name: Assemble index.html
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Build index.html from payload parts
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          parts=(.payload/p??.txt)
+          if [ "${#parts[@]}" -ne 26 ]; then
+            echo "Expected 26 payload parts, found ${#parts[@]}"
+            ls -la .payload || true
+            exit 1
+          fi
+          cat .payload/p00.txt .payload/p01.txt .payload/p02.txt .payload/p03.txt \
+              .payload/p04.txt .payload/p05.txt .payload/p06.txt .payload/p07.txt \
+              .payload/p08.txt .payload/p09.txt .payload/p10.txt .payload/p11.txt \
+              .payload/p12.txt .payload/p13.txt .payload/p14.txt .payload/p15.txt \
+              .payload/p16.txt .payload/p17.txt .payload/p18.txt .payload/p19.txt \
+              .payload/p20.txt .payload/p21.txt .payload/p22.txt .payload/p23.txt \
+              .payload/p24.txt .payload/p25.txt > index.html
+          bytes=$(wc -c < index.html)
+          echo "index.html bytes: $bytes"
+          test "$bytes" -eq 455844
+          grep -q "provider=google&apikey=" index.html
+          grep -q "encodeURIComponent(LEGALSKOOL_CONFIG.supabaseKey)" index.html
+          head -c 15 index.html | grep -q "<!DOCTYPE html>"
+
+      - name: Commit assembled index.html
+        run: |
+          set -euo pipefail
+          git config user.name "realswell"
+          git config user.email "322542834+realswell@users.noreply.github.com"
+          git add index.html
+          git rm -r --ignore-unmatch .payload
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "Add production index.html (Google authorize URL includes apikey)"
+          git push origin HEAD:main
