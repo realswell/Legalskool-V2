@@ -9,6 +9,7 @@ Do not change the DNS for `legalskool.store` until you have checked the Worker o
 Cloudflare’s Worker build must run the app build before Wrangler uploads assets:
 
 - `dist/` is committed because Wrangler checks that `assets.directory` exists before it runs anything else. When `node_modules/typescript` is present, Wrangler rebuilds `dist/` before upload.
+- Pull-request builds run `npx wrangler preview`. That command requires a `previews` block in `wrangler.jsonc`. Assets stay at the top level; the block can be empty.
 - Deploy command: `npx wrangler deploy`
 
 `npm run build` typechecks the React app and writes `dist/`. Wrangler serves `dist/` as static assets and `worker/index.js` for `/api/*` and `/pay/callback`.
