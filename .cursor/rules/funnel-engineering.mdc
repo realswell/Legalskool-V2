@@ -1,0 +1,21 @@
+---
+description: Performance and checkout rules for the LegalSkool sales pages.
+globs: src/**/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# Funnel engineering
+
+- Mobile first. Primary actions sit in the thumb zone and stay at least 48px tall.
+- Keep CLS near zero: set width and height on images, do not inject banners above the hero, and do not shift the sticky CTA.
+- Target FCP under 1 second on a throttled 4G profile. No render-blocking scripts. Fonts are self-hosted with `font-display: swap`.
+- Hero images use `fetchpriority="high"`. Below-the-fold images use lazy loading. WebP files stay under 45 KB.
+- Hashed build assets cache for one year and are immutable. HTML uses `max-age=0, must-revalidate`.
+- Do not add an "Open in Chrome" banner. In-app browser detection is for telemetry and for offering email OTP where Google is blocked.
+- Checkout: preconnect and dns-prefetch Razorpay. Load `checkout.js` async. Create the server `order_id` when the sheet opens or the phone number becomes valid, and recreate it if the bump or amount changes. Never create it only inside the Pay tap.
+- On Pay, call `new Razorpay(options).open()` synchronously. If the script is not ready yet, retry briefly and show the state. Do not leave the button stuck.
+- Razorpay options: prefill `+91` plus the 10-digit number, UPI intent/collect/qr first, then card, netbanking, and wallet, `webview_intent: true`, retry `max_count: 3`, `modal.confirm_close: true`, `escape: false`, and `redirect` with `callback_url`.
+- Unlock only after `/api/verify-payment` accepts the signature. Never fake a payment id and never unlock from the client handler alone.
+- Fire Meta `Purchase` with `eventID` equal to the payment id only after that verification. PageView on route change, ViewContent on `/notes` and `/aivakeel`, InitiateCheckout when the sheet opens.
+- Paid Drive and WhatsApp links are returned only by the server to a verified buyer.
+- No lorem ipsum, TODOs, or dead buttons. Admin secrets are not `VITE_` variables.

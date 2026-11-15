@@ -1,0 +1,12 @@
+# Copy to .dev.vars for `wrangler dev`. Never commit .dev.vars.
+# Dashboard: Workers → legalskool-v2 → Settings → Variables and Secrets.
+# Put every value below in as an encrypted secret except META_PIXEL_ID (plain variable, optional).
+
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
+SUPABASE_URL=https://nbrcnqpibtbsljoevrhy.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=
+ADMIN_EMAILS=
+META_PIXEL_ID=
+CONTENT_LINKS_JSON=
