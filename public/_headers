@@ -1,0 +1,26 @@
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/notes
+  Cache-Control: public, max-age=0, must-revalidate
+
+/aivakeel
+  Cache-Control: public, max-age=0, must-revalidate
+
+/campus
+  Cache-Control: public, max-age=0, must-revalidate
+
+/admin
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self)
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://checkout.razorpay.com https://connect.facebook.net https://www.facebook.com; connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://lumberjack.razorpay.com https://*.supabase.co https://www.facebook.com https://connect.facebook.net https://graph.facebook.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; img-src 'self' data: blob: https://www.facebook.com https://www.google.com https://*.googleusercontent.com; style-src 'self'; font-src 'self'; worker-src 'self' blob:; base-uri 'self'; form-action 'self' https://api.razorpay.com https://checkout.razorpay.com; object-src 'none'
