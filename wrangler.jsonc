@@ -1,6 +1,9 @@
 {
   "name": "legalskool-v2",
   "main": "worker/index.js",
+  "build": {
+    "command": "if [ -d node_modules/typescript ]; then npm run build; else echo 'Using the committed dist folder'; fi"
+  },
   "compatibility_date": "2026-11-14",
   "assets": {
     "directory": "./dist",

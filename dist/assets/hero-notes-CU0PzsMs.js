@@ -1,0 +1,1 @@
+var e=`/assets/hero-notes-CXx_gsP0.webp`;export{e as t};
