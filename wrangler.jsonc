@@ -8,7 +8,9 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/pay/*"]
+    "html_handling": "none",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/pay/*", "/notes", "/notes/*", "/aivakeel", "/aivakeel/*", "/campus", "/campus/*", "/admin", "/admin/*"]
   },
   "previews": {}
 }

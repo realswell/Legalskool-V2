@@ -874,24 +874,30 @@ function withAssetHeaders(response, pathname) {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
+function isSpaPath(pathname) {
+  const path = pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+  if (!path || path.startsWith('api/') || path.startsWith('pay/') || path.startsWith('assets/')) return false;
+  if (path.includes('.')) return false;
+  return true;
+}
+
 async function serveAsset(request, env) {
   if (!env.ASSETS) return new Response('Not found', { status: 404 });
   const url = new URL(request.url);
-  const path = url.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-  let assetRequest = request;
-  if ((request.method === 'GET' || request.method === 'HEAD') && SPA_PATHS.has(path)) {
-    const rewritten = new URL(request.url);
-    rewritten.pathname = '/index.html';
-    assetRequest = new Request(rewritten.toString(), request);
+  const method = request.method.toUpperCase();
+  if ((method === 'GET' || method === 'HEAD') && isSpaPath(url.pathname)) {
+    const indexUrl = new URL(request.url);
+    indexUrl.pathname = '/index.html';
+    indexUrl.search = '';
+    const indexResponse = await env.ASSETS.fetch(new Request(indexUrl.toString(), { method, headers: request.headers }));
+    const wrapped = withAssetHeaders(indexResponse, '/index.html');
+    const headers = new Headers(wrapped.headers);
+    headers.delete('location');
+    headers.set('cache-control', 'public, max-age=0, must-revalidate');
+    return new Response(method === 'HEAD' ? null : wrapped.body, { status: 200, headers });
   }
-  const response = await env.ASSETS.fetch(assetRequest);
-  if (response.status === 404 && (request.method === 'GET' || request.method === 'HEAD')) {
-    const rewritten = new URL(request.url);
-    rewritten.pathname = '/index.html';
-    const fallback = await env.ASSETS.fetch(new Request(rewritten.toString(), request));
-    return withAssetHeaders(fallback, '/index.html');
-  }
-  return withAssetHeaders(response, new URL(assetRequest.url).pathname);
+  const response = await env.ASSETS.fetch(request);
+  return withAssetHeaders(response, url.pathname);
 }
 
 export async function handleRequest(request, env, fetcher = fetch) {

@@ -221,3 +221,25 @@ test('campus links are limited to the signed-in buyer and admin requires the ser
   assert.equal(csv.students[0].utm_source, 'meta_ads');
   assert.equal(Object.hasOwn(csv.students[0], 'password_hash'), false);
 });
+
+test('spa routes return index.html with 200 and keep the request path', async () => {
+  const assets = [];
+  const runtimeEnv = env({
+    ASSETS: {
+      async fetch(request) {
+        const path = new URL(request.url).pathname;
+        assets.push(path);
+        if (path === '/index.html') return new Response('<html>notes app</html>', { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } });
+        return new Response(null, { status: 307, headers: { location: '/' } });
+      },
+    },
+  });
+  const notes = await handleRequest(new Request('https://legalskool.store/notes?utm_source=meta&fbclid=abc'), runtimeEnv);
+  assert.equal(notes.status, 200);
+  assert.equal(notes.headers.get('location'), null);
+  assert.match(await notes.text(), /notes app/);
+  assert.deepEqual(assets, ['/index.html']);
+  const head = await handleRequest(new Request('https://legalskool.store/aivakeel', { method: 'HEAD' }), runtimeEnv);
+  assert.equal(head.status, 200);
+  assert.equal(head.headers.get('location'), null);
+});
